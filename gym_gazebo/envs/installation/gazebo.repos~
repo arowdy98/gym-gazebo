@@ -57,16 +57,10 @@ repositories:
     url: https://github.com/tu-darmstadt-ros-pkg/hector_gazebo/
     version: indigo-devel
 
-  husky:
-    type: git
-    url: https://github.com/husky/husky_simulator/
-    version: indigo-devel
-
-  husky_simulator:
+  hector_gazebo:
     type: git
     url: https://github.com/husky/husky/
     version: indigo-devel
-
 
   image_common:
     type: git
