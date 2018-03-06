@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Import and build dependencies
+cd ../../catkin_ws/src/
+vcs import < ../../gazebo.repos
+cd ..
+# Make the msgs before building other packages
+catkin_make --pkg mav_msgs
+catkin_make --pkg ar_track_alvar_msgs
+source devel/setup.bash
+catkin_make -j 1
+

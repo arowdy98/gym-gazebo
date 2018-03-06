@@ -27,19 +27,19 @@ repositories:
   ecl_core:
     type: git
     url: https://github.com/stonier/ecl_core
-    version: devel
+    version: 0.61-indigo-kinetic
   ecl_lite:
     type: git
     url: https://github.com/stonier/ecl_lite
-    version: devel
+    version: 0.61-indigo-kinetic
   ecl_navigation:
     type: git
     url: https://github.com/stonier/ecl_navigation
-    version: devel
+    version: 0.60-indigo-kinetic
   ecl_tools:
     type: git
     url: https://github.com/stonier/ecl_tools
-    version: devel
+    version: release/0.61-indigo-kinetic
   driver_base:
     type: git
     url: https://github.com/ros-drivers/driver_common.git
@@ -57,10 +57,16 @@ repositories:
     url: https://github.com/tu-darmstadt-ros-pkg/hector_gazebo/
     version: indigo-devel
 
-  hector_gazebo:
+  husky:
+    type: git
+    url: https://github.com/husky/husky_simulator/
+    version: indigo-devel
+
+  husky_simulator:
     type: git
     url: https://github.com/husky/husky/
     version: indigo-devel
+
 
   image_common:
     type: git
@@ -90,10 +96,10 @@ repositories:
 #    type: git
 #    url: https://github.com/erlerobot/mavros.git
 #    version: gazebo_udp
-#  mav_comm:
-#    type: git
-#    url: https://github.com/PX4/mav_comm.git
-#    version: master
+  mav_comm:
+    type: git
+    url: https://github.com/PX4/mav_comm.git
+    version: master
   navigation:
     type: git
     url: https://github.com/ros-planning/navigation

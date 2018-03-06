@@ -25,7 +25,7 @@ catkin_init_workspace
 
 # Install dependencies
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-sudo apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv-key 0xB01FA116
+sudo -E apt-key adv --keyserver hkp://pool.sks-keyservers.net --recv-key 0xB01FA116
 sudo apt-get update
 sudo apt-get install -y git                            \
                         mercurial                      \
@@ -67,8 +67,8 @@ sudo apt-get install -y git                            \
                         libtinyxml2-dev
 sudo easy_install numpy
 sudo easy_install --upgrade numpy
-sudo pip install --upgrade matplotlib
-sudo pip2 install pymavlink MAVProxy catkin_pkg --upgrade
+sudo pip -E -H install --upgrade matplotlib
+sudo pip2 -E -H install pymavlink MAVProxy catkin_pkg --upgrade
 echo "\nDependencies installed\n"
 
 
@@ -99,7 +99,9 @@ echo "## AMP/Ardupilot installed ##"
 cd ../../catkin_ws/src/
 vcs import < ../../gazebo.repos
 cd ..
+# Make the msgs before building the everything
 catkin_make --pkg mav_msgs
+catkin_make --pkg ar_track_alvar_msgs
 source devel/setup.bash
 catkin_make -j 1
 bash -c 'echo source `pwd`/devel/setup.bash >> ~/.bashrc'
@@ -113,12 +115,12 @@ fi
 
 # Theano and Keras installation and requisites
 cd ../
-sudo pip install h5py
+sudo pip -E -H install h5py
 sudo apt-get install gfortran
 git clone git://github.com/Theano/Theano.git
 cd Theano/
 sudo python setup.py develop
-sudo pip install keras
+sudo pip -E -H install keras
 
 echo "## Theano and Keras installed ##"
 echo "## Installation finished ##"
