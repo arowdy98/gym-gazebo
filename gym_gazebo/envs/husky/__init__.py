@@ -1,1 +1,2 @@
 from gym_gazebo.envs.husky.gazebo_playpen_husky_lidar import GazeboPlaypenHuskyLidarEnv
+from gym_gazebo.envs.husky.gazebo_dynamic_husky_lidar import GazeboDynamicHuskyLidarEnv
