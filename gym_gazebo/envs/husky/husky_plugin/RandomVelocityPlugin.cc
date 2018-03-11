@@ -120,6 +120,23 @@ void RandomVelocityPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       _sdf->Get<ignition::math::Vector3d>("initial_velocity");
   }
 
+  //Set random position of each obstacle
+  ignition::math::Pose3<double> pose_temp;
+  ignition::math::Vector3<double> position_temp;
+  ignition::math::Vector3<double> rpy_temp;
+
+  // Set the bounds for random position
+  position_temp.Set(
+    ignition::math::Rand::DblUniform(-8, 8),
+    ignition::math::Rand::DblUniform(-8, 8),
+    ignition::math::Rand::DblUniform(0, 0));
+  rpy_temp.Set(0,0,0);
+
+  
+  pose_temp.Set(position_temp,rpy_temp);
+
+  this->dataPtr->link->SetWorldPose(pose_temp); 
+
   // Set the velocity factor
   if (_sdf->HasElement("velocity_factor"))
     this->dataPtr->velocityFactor = _sdf->Get<double>("velocity_factor");
