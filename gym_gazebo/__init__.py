@@ -22,7 +22,11 @@ register(
     entry_point='gym_gazebo.envs.husky:GazeboDynamicHuskyLidarEnv',
     # More arguments here
 )
-
+register(
+    id='GazeboHuskyWallMovingObstaclesLidar-v0',
+    entry_point='gym_gazebo.envs.husky:GazeboHuskyWallMovingObstaclesLidarEnv',
+    # More arguments here
+)
 register(
     id='GazeboCircuitTurtlebotLidar-v0',
     entry_point='gym_gazebo.envs.turtlebot:GazeboCircuitTurtlebotLidarEnv',
