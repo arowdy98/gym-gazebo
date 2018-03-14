@@ -190,6 +190,24 @@ void RandomVelocityPlugin::Update(const common::UpdateInfo &_info)
     this->dataPtr->velocity.Z(ignition::math::clamp(this->dataPtr->velocity.Z(),
         this->dataPtr->zRange.X(), this->dataPtr->zRange.Y()));
 
+      //Set random position of each obstacle
+      ignition::math::Pose3<double> pose_temp;
+      ignition::math::Vector3<double> position_temp;
+      ignition::math::Vector3<double> rpy_temp;
+
+      // Set the bounds for random position
+      position_temp.Set(
+      ignition::math::Rand::DblUniform(-8, 8),
+      ignition::math::Rand::DblUniform(-8, 8),
+      ignition::math::Rand::DblUniform(0, 0));
+      rpy_temp.Set(0,0,0);
+
+
+      pose_temp.Set(position_temp,rpy_temp);
+
+      this->dataPtr->link->SetWorldPose(pose_temp); 
+
+
     this->dataPtr->prevUpdate = _info.simTime;
   }
 

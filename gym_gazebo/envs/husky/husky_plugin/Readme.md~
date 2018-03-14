@@ -1,22 +1,23 @@
 Compiling the plugin:
 
 <Gazebo 7 required>
-1. mkdir build
-2. cd build
-3. cmake ..
-4. make
+```  
+ mkdir build  
+ cd build  
+ cmake ..  
+ make  
+```
 
 
-
-Add your library path to the GAZEBO_PLUGIN_PATH:
+* Add your library path to the GAZEBO_PLUGIN_PATH:
 
 export GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:..husky_plugin/build
 
 
 
-To give this velocity to a model:
+* To give this velocity to a model:
 
-Add the following lines:
+### Add the following lines:
 
 <plugin name="random" filename="libvelset.so">
 
