@@ -54,11 +54,11 @@ Now, for the husky environment we require packages provided by Clearpath Robotic
   
 | Name | Middleware | Description | Observation Space | Action Space | Reward range |
 | ---- | ------ | ----------- | ----- | --------- | -------- |
-| ![husky_dynamic-v0.png](imgs/husky_dynamic.jpg)`GazeboHusky-v0` | ROS | | Continous | Continuos | |
+| ![husky_dynamic-v0.png](imgs/husky_dynamic.png)`GazeboHuskyWallMovingObstacles-v0` | ROS | | Continous | Continuos | |
 
   
 ## Visualize the Learning Process
-<img src="imgs/husky_learning.gif" width=40%>
+<p align="center"><img src="imgs/husky_learning.gif" width=80%></p>
 
 
 <!--[![alt tag](https://travis-ci.org/erlerobot/gym.svg?branch=master)](https://travis-ci.org/erlerobot/gym)-->
