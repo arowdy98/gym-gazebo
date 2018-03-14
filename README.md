@@ -1,17 +1,5 @@
 # An OpenAI gym extension for using Gazebo known as `gym-gazebo`
 
-<!--[![alt tag](https://travis-ci.org/erlerobot/gym.svg?branch=master)](https://travis-ci.org/erlerobot/gym)-->
-
-This work presents an extension of the initial OpenAI gym for robotics using ROS and Gazebo. A whitepaper about this work is available at https://arxiv.org/abs/1608.05742. Please use the following BibTex entry to cite our work:
-
-```
-@article{zamora2016extending,
-  title={Extending the OpenAI Gym for robotics: a toolkit for reinforcement learning using ROS and Gazebo},
-  author={Zamora, Iker and Lopez, Nestor Gonzalez and Vilches, Victor Mayoral and Cordero, Alejandro Hernandez},
-  journal={arXiv preprint arXiv:1608.05742},
-  year={2016}
-}
-```
 
 -----
 
@@ -19,8 +7,8 @@ This work presents an extension of the initial OpenAI gym for robotics using ROS
 ## Getting the Husky Environment Ready
 ### Requirement
 
-**ROS Indigo**   
-**Gazebo 7**  
+* ROS Indigo   
+* Gazebo 7  
 
 
 ### Build and install gym-gazebo
@@ -44,22 +32,47 @@ Now, for the husky environment we require packages provided by Clearpath Robotic
   a. The plugins for gazebo world allow us to define behaviour in gazebo world(Random pose, Random velocity of obstacles,etc).  
   b. Plugins required for our experiment are located in ../gym-gazebo/gym_gazebo/envs/husky/husky_plugin .
     Run the following commands to build the plugin. For more details regarding usage, see the README in the husky_plugin    folder.  
-    ```mkdir build
+    ```
+    mkdir build
     cd build
     cmake ..
     make
     ```
   c. Add the following line to your bashrc.  
-  ```  export GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:../gym-gazebo/gym_gazebo/envs/husky/husky_plugin/build
+  ```
+  export GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:../gym-gazebo/gym_gazebo/envs/husky/husky_plugin/build 
+  
   ```
  
 
 ### Running experiments  
-  ```cd ../gym-gazebo/examples/husky  
+  ```
+    cd ../gym-gazebo/examples/husky    
     python husky__wall_moving_obstacles_lidar_qlearn  
   ```
+  
+  
+| Name | Middleware | Description | Observation Space | Action Space | Reward range |
+| ---- | ------ | ----------- | ----- | --------- | -------- |
+| ![husky_dynamic-v0.png](imgs/husky_dynamic.jpg)`GazeboHusky-v0` | ROS | | Continous | Continuos | |
+
+  
+## Visualize the Learning Process
+<img src="imgs/husky_learning.gif" width=40%>
 
 
+<!--[![alt tag](https://travis-ci.org/erlerobot/gym.svg?branch=master)](https://travis-ci.org/erlerobot/gym)-->
+
+This work presents an extension of the initial OpenAI gym for robotics using ROS and Gazebo. A whitepaper about this work is available at https://arxiv.org/abs/1608.05742. Please use the following BibTex entry to cite our work:
+
+```
+@article{zamora2016extending,
+  title={Extending the OpenAI Gym for robotics: a toolkit for reinforcement learning using ROS and Gazebo},
+  author={Zamora, Iker and Lopez, Nestor Gonzalez and Vilches, Victor Mayoral and Cordero, Alejandro Hernandez},
+  journal={arXiv preprint arXiv:1608.05742},
+  year={2016}
+}
+```
 
 **`gym-gazebo` is a complex piece of software for roboticists that puts together simulation tools, robot middlewares (ROS, ROS 2), machine learning and reinforcement learning techniques. All together to create an environment whereto benchmark and develop behaviors with robots. Setting up `gym-gazebo` appropriately requires relevant familiarity with these tools.**
 
