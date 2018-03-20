@@ -12,7 +12,16 @@
     <arg name="laser_enabled" value="$(arg laser_enabled)"/>
     <arg name="ur5_enabled" value="$(arg ur5_enabled)"/>
     <arg name="kinect_enabled" value="$(arg kinect_enabled)"/>
-
   </include>
+
+
+  <node name="husky_fake_localizer" pkg="husky_localizer" type="husky_fake_localizer" output="screen">
+  </node>
+  
+  <node name="navfn_node" pkg="navfn" type="navfn_node" output="screen">
+    <rosparam file="/home/harshit/work/gym-gazebo/gym_gazebo/envs/assets/launch/husky_costmap_params.yaml" command="load" ns="costmap" />
+  </node>
+
+
 
 </launch>
