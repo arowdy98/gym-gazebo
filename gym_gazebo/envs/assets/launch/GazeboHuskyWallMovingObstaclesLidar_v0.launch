@@ -15,7 +15,7 @@
   </include>
 
 
-  <node name="husky_fake_localizer" pkg="husky_localizer" type="husky_fake_localizer" output="screen">
+  <node name="husky_fake_localizer" pkg="husky_localizer" type="husky_fake_localizer">
   </node>
   
   <node name="navfn_node" pkg="navfn" type="navfn_node" output="screen">

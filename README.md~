@@ -25,6 +25,7 @@ For installation on ROS Indigo:-
   f. [mav_comm](https://github.com/ethz-asl/mav_comm)  
 Now, for the husky environment we require packages provided by Clearpath Robotics for model import.  
   g. [husky](https://github.com/husky/husky)  
+	Note: Replace the urdf and launch files in husky/husky_description with those given in additional_packages/husky_description.  
   h. Copy all the packages given in the additional_packages folder in the path ../gym-gazebo/gym_gazebo/envs/installation/  
   
     
@@ -48,7 +49,7 @@ Now, for the husky environment we require packages provided by Clearpath Robotic
 ### Running experiments  
   ```
     cd ../gym-gazebo/examples/husky    
-    python husky__wall_moving_obstacles_lidar_qlearn  
+    python husky__wall_moving_obstacles_lidar_qlearn.py  
   ```
   
   
@@ -58,7 +59,7 @@ Now, for the husky environment we require packages provided by Clearpath Robotic
 
   
 ## Visualize the Learning Process
-<img src="imgs/husky_learning.gif" width=40%>
+<p align="center"><img src="imgs/husky_learning.gif" width=80%></p>
 
 
 <!--[![alt tag](https://travis-ci.org/erlerobot/gym.svg?branch=master)](https://travis-ci.org/erlerobot/gym)-->

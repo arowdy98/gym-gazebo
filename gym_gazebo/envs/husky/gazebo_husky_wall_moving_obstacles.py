@@ -12,6 +12,7 @@ from geometry_msgs.msg import PoseStamped
 
 from std_msgs.msg import Empty as EmptyM
 from nav_msgs.msg import Path
+from nav_msgs.msg import Odometry
 
 from std_srvs.srv import Empty
 import os
@@ -65,6 +66,7 @@ class GazeboHuskyWallMovingObstaclesLidarEnv(gazebo_env.GazeboEnv):
         except (rospy.ServiceException) as e:
             print ("/gazebo/unpause_physics service call failed")
 
+        # Define the messages to publish for each action here
         if action == 0: #FORWARD
             vel_cmd = Twist()
             vel_cmd.linear.x = 0.5
@@ -84,7 +86,7 @@ class GazeboHuskyWallMovingObstaclesLidarEnv(gazebo_env.GazeboEnv):
 
         # Define the states for our MDP
 
-        # Get laserscan data, costmap
+        # Get laserscan data
         data = None
         while data is None:
             try:
@@ -92,13 +94,17 @@ class GazeboHuskyWallMovingObstaclesLidarEnv(gazebo_env.GazeboEnv):
             except:
                 pass
 
+        # Read Odometry
+        odometry= None
+        while odometry is None:
+        	try:
+        		odometry = rospy.wait_for_message('/base_pose_ground_truth', Odometry, timeout=5)
+        	except:
+        		pass
 
         # Get current position and velocity
-        odometry=subprocess.check_output(["rosservice","call","gazebo/get_model_state", "{model_name: mobile_base}"])
+        #odometry=subprocess.check_output(["rosservice","call","gazebo/get_model_state", "{model_name: mobile_base}"])
        
-
-
-
         rospy.wait_for_service('/gazebo/pause_physics')
         try:
             #resp_pause = pause.call()
@@ -134,6 +140,8 @@ class GazeboHuskyWallMovingObstaclesLidarEnv(gazebo_env.GazeboEnv):
         except (rospy.ServiceException) as e:
             print ("/gazebo/reset_simulation service call failed")
 
+
+        # Create a publisher that publishes the goal to navfn planner
         pub_goal=rospy.Publisher('/navfn_node/goal', PoseStamped, queue_size=5)
         goal=PoseStamped()
         goal.header.frame_id="map"
@@ -145,22 +153,6 @@ class GazeboHuskyWallMovingObstaclesLidarEnv(gazebo_env.GazeboEnv):
         goal.pose.orientation.x=0.26
         goal.pose.orientation.x=1.0
         pub_goal.publish(goal)
-        print("Published goal, getting plan!")
-        plan= None
-        ctr =0 
-        while plan is None:
-            if(ctr==5):
-                print("Path not found")
-                break
-
-            try:
-                plan = rospy.wait_for_message('/navfn_node/navfn_planner/plan', Path, timeout=5)
-            except:
-                ctr=ctr+1
-                pass
-
-        print(plan)
-
 
         #call(["roslaunch", "husky_navigation", "move_base_mapless_demo.launch"])
         #os.system('roslaunch husky_navigation move_base_mapless_demo.launch')
@@ -172,13 +164,40 @@ class GazeboHuskyWallMovingObstaclesLidarEnv(gazebo_env.GazeboEnv):
         except (rospy.ServiceException) as e:
             print ("/gazebo/unpause_physics service call failed")
 
-        #read laser data
+        # Read plan
+        plan= None
+        ctr =0 
+        while plan is None:
+            if(ctr==5):
+                print("Path not found")
+                break
+            try:
+            	# Navfn planner node responds with a plan from current position to goal
+                plan = rospy.wait_for_message('/navfn_node/navfn_planner/plan', Path, timeout=5)
+            except:
+                ctr=ctr+1
+                pass
+
+        # Read laser data
         data = None
         while data is None:
             try:
                 data = rospy.wait_for_message('/scan', LaserScan, timeout=5)
             except:
                 pass
+
+
+        # Read Odometry
+        odometry= None
+        while odometry is None:
+        	try:
+        		odometry = rospy.wait_for_message('/base_pose_ground_truth', Odometry, timeout=5)
+        	except:
+        		pass
+
+
+        state_vector=(plan,data,odometry)
+        print("State vector created")
 
         rospy.wait_for_service('/gazebo/pause_physics')
         try:
