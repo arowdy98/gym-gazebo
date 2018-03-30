@@ -22,7 +22,7 @@ def render():
 
 if __name__ == '__main__':
 
-    env = gym.make('GazeboHuskyWallMovingObstaclesLidar-v0')
+    env = gym.make('GazeboReactiveHuskyLidar-v0')
 
 
     outdir = '/tmp/gazebo_gym_experiments'

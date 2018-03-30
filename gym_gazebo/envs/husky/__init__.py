@@ -1,3 +1,4 @@
 from gym_gazebo.envs.husky.gazebo_playpen_husky_lidar import GazeboPlaypenHuskyLidarEnv
 from gym_gazebo.envs.husky.gazebo_dynamic_husky_lidar import GazeboDynamicHuskyLidarEnv
 from gym_gazebo.envs.husky.gazebo_husky_wall_moving_obstacles import GazeboHuskyWallMovingObstaclesLidarEnv
+from gym_gazebo.envs.husky.gazebo_husky_reactive_control import GazeboHuskyReactiveControlEnv

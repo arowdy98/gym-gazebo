@@ -21,11 +21,11 @@ from std_msgs.msg import String
 from subprocess import call
 from gym.utils import seeding
 import time
-class GazeboHuskyWallMovingObstaclesLidarEnv(gazebo_env.GazeboEnv):
+class GazeboHuskyReactiveControlEnv(gazebo_env.GazeboEnv):
 
     def __init__(self):
         # Launch the simulation with the given launchfile name
-        gazebo_env.GazeboEnv.__init__(self, "GazeboHuskyWallMovingObstaclesLidar_v0.launch")
+        gazebo_env.GazeboEnv.__init__(self, "GazeboHuskyReactiveControlLidar_v0.launch")
         print("Initialize simulation")
         time.sleep(30)
         self.vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=5)
@@ -277,7 +277,7 @@ class GazeboHuskyWallMovingObstaclesLidarEnv(gazebo_env.GazeboEnv):
         #         reward = 1
         # else:
 
-        #     reward = -200
+        #     reward = -200 
 
         return state, reward, done, {}
 

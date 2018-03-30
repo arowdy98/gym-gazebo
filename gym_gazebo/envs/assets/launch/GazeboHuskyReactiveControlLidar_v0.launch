@@ -22,9 +22,9 @@
     <rosparam file="husky_costmap_params.yaml" command="load" ns="costmap" />
   </node>
 
-  <!-- <include file="$(find husky_navigation)/launch/move_base.launch">
+  <include file="$(find husky_navigation)/launch/move_base.launch">
     <arg name="no_static_map" value="true"/>
   </include>
- -->
+
 
 </launch>

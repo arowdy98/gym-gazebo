@@ -12,6 +12,13 @@
   <arg name="ur5_enabled" default="$(optenv HUSKY_UR5_ENABLED false)"/>
   <arg name="kinect_enabled" default="$(optenv HUSKY_KINECT_ENABLED false)"/>
 
+<!-- 
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="use_sim_time" value="true"/>
+    <arg name="debug" value="false"/>
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="world_name" value="$(arg world_file)"/>
+  </include> -->
   
 
   <include file="$(find husky_gazebo)/launch/husky_empty_world.launch">
@@ -23,4 +30,19 @@
   </include>
 
 
+
+<!--   <include file="$(find turtlebot_gazebo)/launch/includes/$(arg base).launch.xml">
+    <arg name="base" value="$(arg base)"/>
+    <arg name="stacks" value="$(arg stacks)"/>
+    <arg name="3d_sensor" value="$(arg 3d_sensor)"/>
+  </include> -->
+ <!--  <include file="$(find husky_gazebo)/launch/spawn_husky.launch">
+    <arg name="laser_enabled" value="$(arg laser_enabled)"/>
+  </include>
+ -->
+  
+<!--   <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+    <param name="publish_frequency" type="double" value="30.0" />
+  </node>
+ -->
 </launch>
