@@ -39,9 +39,13 @@ class GazeboHuskyReactiveControlEnv(gazebo_env.GazeboEnv):
         self.reward_range = (-np.inf, np.inf)
 
         self.last_waypoint_achieved=0
+        self.prev_odometry=Odometry()
         self.last_k_steps=[]
         self.max_k_steps=40
 
+        self.bot_max_velocity_x=6.0
+        self.bot_max_angular_z=1.3
+        self.goal=PoseStamped()
         self.plan= Path()
         self.x_y_tolerance=0.2
         self.theta_tolerance=0.3
@@ -65,17 +69,14 @@ class GazeboHuskyReactiveControlEnv(gazebo_env.GazeboEnv):
 
 
 
-    def get_state(self,plan,data,odometry,done,progress):
+    def get_state(self,data,odometry,done):
         # Compute vector from current position to next unvisited nearest waypoint
         self.x_y_tolerance=0.2
         self.theta_tolerance=0.3
         new_ranges=36
         min_range = 0.4 #min_obstacle_range
         deviation_threshold=100
-        # print(self.last_waypoint_achieved)
-        # print("----------")
-        # print(self.plan.poses[0].pose)
-
+    
 
         if(len(self.last_k_steps)<self.max_k_steps):
         	self.last_k_steps.append(odometry)
@@ -84,35 +85,6 @@ class GazeboHuskyReactiveControlEnv(gazebo_env.GazeboEnv):
         	self.last_k_steps.append(odometry)
 
 
-
-
-        flag=0
-        min_dist=sys.maxint
-        for pose_element in self.plan.poses:
-        	if(self.in_tolerance(pose_element,odometry.pose,0.001,0.002) and flag==1):
-        		self.last_waypoint_achieved=pose_element.pose
-        		progress=1
-        		break
-        	if(pose_element.pose==self.last_waypoint_achieved):
-        		flag=1
-
-
-       	flag=0;
-
-       	min_id=0
-        for i,pose_value in enumerate(self.plan.poses):
-            if flag==1:
-                if(min_dist>np.sqrt(self.sq(odometry.pose.pose.position.x-pose_value.pose.position.x)+self.sq(odometry.pose.pose.position.y-pose_value.pose.position.y)+self.sq(odometry.pose.pose.position.z-pose_value.pose.position.z))):
-                    min_dist=np.sqrt(self.sq(odometry.pose.pose.position.x-pose_value.pose.position.x)+self.sq(odometry.pose.pose.position.y-pose_value.pose.position.y)+self.sq(odometry.pose.pose.position.z-pose_value.pose.position.z))
-                    min_id=i
-
-            if pose_value.pose==self.last_waypoint_achieved:
-                flag=1
-
-        # print("min_dist=%f"%min_dist)
-        if(min_dist>deviation_threshold):
-        	# print("deviated from path")
-        	done=True
 
         discretized_ranges = []
         mod = len(data.ranges)/new_ranges
@@ -126,9 +98,8 @@ class GazeboHuskyReactiveControlEnv(gazebo_env.GazeboEnv):
                 else:
                     discretized_ranges.append(float(data.ranges[i]))
 
-        plan_vector=[float(plan.poses[min_id].pose.position.x)-float(odometry.pose.pose.position.x),float(plan.poses[min_id].pose.position.y)-float(odometry.pose.pose.position.y),float(plan.poses[min_id].pose.position.z)-float(odometry.pose.pose.position.z)]
         orientation=[float(odometry.pose.pose.orientation.x),float(odometry.pose.pose.orientation.y),float(odometry.pose.pose.orientation.z),float(odometry.pose.pose.orientation.w)]
-        state =plan_vector+discretized_ranges+orientation
+        state =discretized_ranges+orientation
         # print(state)
         return state,done
 
@@ -168,30 +139,30 @@ class GazeboHuskyReactiveControlEnv(gazebo_env.GazeboEnv):
             print ("/gazebo/unpause_physics service call failed")
 
         # Define the messages to publish for each action here
-        if action == 0: #FORWARD
+        if action == 0: #FORWARD PUSH
             vel_cmd = Twist()
-            vel_cmd.linear.x = 4.0
-            vel_cmd.angular.z = 0.0
+            vel_cmd.linear.x = min(4.0+self.prev_odometry.twist.twist.linear.x,self.bot_max_velocity_x)
+            vel_cmd.angular.z = self.prev_odometry.twist.twist.angular.z
             self.vel_pub.publish(vel_cmd)
-        elif action == 1: #LEFT
+        elif action == 1: #HARD LEFT
             vel_cmd = Twist()
-            vel_cmd.linear.x = 0.02
-            vel_cmd.angular.z = 1.0
+            vel_cmd.linear.x = min(self.prev_odometry.twist.twist.linear.x,self.bot_max_velocity_x)
+            vel_cmd.angular.z = min(1.0+self.prev_odometry.twist.twist.angular.z,self.bot_max_angular_z)
             self.vel_pub.publish(vel_cmd)
         elif action == 2: #RIGHT
             vel_cmd = Twist()
-            vel_cmd.linear.x = -0.02
-            vel_cmd.angular.z = -1.0
+            vel_cmd.linear.x = min(self.prev_odometry.twist.twist.linear.x,self.bot_max_velocity_x)
+            vel_cmd.angular.z = max(-1.0+self.prev_odometry.twist.twist.angular.z,0)
             self.vel_pub.publish(vel_cmd)
         elif action==3: #Backward
             vel_cmd = Twist()
-            vel_cmd.linear.x = -4.0
-            vel_cmd.angular.z = 0.0
+            vel_cmd.linear.x = max(-4.0+self.prev_odometry.twist.twist.linear.x,0)
+            vel_cmd.angular.z = 0.0+self.prev_odometry.twist.twist.angular.z
             self.vel_pub.publish(vel_cmd)
-        elif action==4: # Stop in place
+        elif action==4: # Continue as it is
             vel_cmd = Twist()
-            vel_cmd.linear.x = 0.0
-            vel_cmd.angular.z = 0.0
+            vel_cmd.linear.x = 0.0+self.prev_odometry.twist.twist.linear.x
+            vel_cmd.angular.z = 0.0+self.prev_odometry.twist.twist.angular.z
             self.vel_pub.publish(vel_cmd)
         	
 
@@ -224,9 +195,8 @@ class GazeboHuskyReactiveControlEnv(gazebo_env.GazeboEnv):
             print ("/gazebo/pause_physics service call failed")
 
         # state,done = self.discretize_observation(data,5)
-        progress=0
         done=False
-        state,done=self.get_state(self.plan,data,odometry,done,progress)
+        state,done=self.get_state(data,odometry,done)
         # Rewards
         min_range = 0.5 #min_obstacle_range
         min_distance_moved=0.2
@@ -235,7 +205,7 @@ class GazeboHuskyReactiveControlEnv(gazebo_env.GazeboEnv):
 
         if not done:
 	        # If bot reaches goal
-	        if self.in_tolerance(self.plan.poses[-1],odometry.pose,self.x_y_tolerance,self.theta_tolerance):
+	        if self.in_tolerance(self.goal,odometry.pose,self.x_y_tolerance,self.theta_tolerance):
 	            done=True
 	            reward=10000
 	            return
@@ -264,9 +234,7 @@ class GazeboHuskyReactiveControlEnv(gazebo_env.GazeboEnv):
 
 	        # If bot achieves next waypoint
 
-	        if progress==1:
-	            reward=10
-
+	    
 
 
 
@@ -312,33 +280,33 @@ class GazeboHuskyReactiveControlEnv(gazebo_env.GazeboEnv):
         except (rospy.ServiceException) as e:
             print ("/gazebo/unpause_physics service call failed")
 
-        pub_goal=rospy.Publisher('/navfn_node/goal', PoseStamped, queue_size=5)
-        goal=PoseStamped()
-        goal.header.frame_id="map"
-        goal.pose.position.x=7.0
-        goal.pose.position.y=7.0
-        goal.pose.position.z=0.0
-        goal.pose.orientation.x=0.0
-        goal.pose.orientation.y=0.0
-        goal.pose.orientation.z=0.26
-        goal.pose.orientation.w=1.0
+        pub_goal=rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size=5)
+        
+        self.goal.header.frame_id="map"
+        self.goal.pose.position.x=7.0
+        self.goal.pose.position.y=7.0
+        self.goal.pose.position.z=0.0
+        self.goal.pose.orientation.x=0.0
+        self.goal.pose.orientation.y=0.0
+        self.goal.pose.orientation.z=0.26
+        self.goal.pose.orientation.w=1.0
 
-        # pub_goal.publish(goal)
+        pub_goal.publish(self.goal)
 
 
         # Read plan
-        self.plan= None
-        ctr =0 
-        while self.plan is None:
-            try:
-            	# Navfn planner node responds with a plan from current position to goal
-            	pub_goal.publish(goal)
-                self.plan = rospy.wait_for_message('/navfn_node/navfn_planner/plan', Path, timeout=5)
-                if(self.plan != None):
-                	if(len(self.plan.poses)==0):
-                		self.plan=None
-            except:
-                pass
+        # self.plan= None
+        # ctr =0 
+        # while self.plan is None:
+        #     try:
+        #     	# Navfn planner node responds with a plan from current position to goal
+        #     	pub_goal.publish(goal)
+        #         self.plan = rospy.wait_for_message('/move_base/NavfnROS/plan', Path, timeout=5)
+        #         if(self.plan != None):
+        #         	if(len(self.plan.poses)==0):
+        #         		self.plan=None
+        #     except:
+        #         pass
 
 
         #print(plan)
@@ -360,21 +328,20 @@ class GazeboHuskyReactiveControlEnv(gazebo_env.GazeboEnv):
         	except:
         		pass
 
+        self.prev_odometry=odometry
         # print(data)
         # print(odometry)
 
    #      if data == None or odometry == None or self.plan==None:
 			# return -1       		 
 
-		print(len(self.plan.poses))
-        self.last_waypoint_achieved=self.plan.poses[0].pose       
+		# print(len(self.plan.poses))
+  #       self.last_waypoint_achieved=self.plan.poses[0].pose       
 
-        progress=0
+        # progress=0
         done= False
-        state,done=self.get_state(self.plan,data,odometry,done,progress)
+        state,done=self.get_state(data,odometry,done)
 
-        # print("State vector created")
-        # print(state_vector)
         rospy.wait_for_service('/gazebo/pause_physics')
         try:
             #resp_pause = pause.call()
