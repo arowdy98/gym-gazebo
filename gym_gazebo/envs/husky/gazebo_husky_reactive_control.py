@@ -9,6 +9,7 @@ from gym_gazebo.envs import gazebo_env
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import PoseStamped
+from actionlib_msgs.msg import GoalStatusArray
 
 from std_msgs.msg import Empty as EmptyM
 from nav_msgs.msg import Path
@@ -184,6 +185,13 @@ class GazeboHuskyReactiveControlEnv(gazebo_env.GazeboEnv):
         	except:
         		pass
 
+        goal_status=None
+        while goal_status is None:
+            try:
+                goal_status=rospy.wait_for_message('/move_base/status', GoalStatusArray, timeout=5)
+            except:
+                pass
+
         # Get current position and velocity
         #odometry=subprocess.check_output(["rosservice","call","gazebo/get_model_state", "{model_name: mobile_base}"])
        
@@ -202,13 +210,26 @@ class GazeboHuskyReactiveControlEnv(gazebo_env.GazeboEnv):
         min_distance_moved=0.2
         reward=0
 
+        ## TO DO 
+        # If move_base status = 4 done = true
 
+
+        # if(len(goal_status.status_list)!=0):
+        #     print(goal_status.status_list[0].status)
         if not done:
 	        # If bot reaches goal
-	        if self.in_tolerance(self.goal,odometry.pose,self.x_y_tolerance,self.theta_tolerance):
-	            done=True
-	            reward=10000
-	            return
+            if(len(goal_status.status_list)!=0):
+                if goal_status.status_list[0].status==2 or goal_status.status_list[0].status==4 or goal_status.status_list[0].status==5:
+                    done=True
+                    reward=-1000
+
+                if goal_status.status_list[0].status==3:
+                    done=True
+                    reward=40000
+	        # if self.in_tolerance(self.goal,odometry.pose,self.x_y_tolerance,self.theta_tolerance):
+	        #     done=True
+	        #     reward=40000
+	        #     return
 
 	        # Bot hits a obstacle
 	        # if np.any(np.asarray(data.ranges)<min_range & np.asarray(data.ranges)>0):
@@ -273,16 +294,9 @@ class GazeboHuskyReactiveControlEnv(gazebo_env.GazeboEnv):
         #call(["roslaunch", "husky_navigation", "move_base_mapless_demo.launch"])
         #os.system('roslaunch husky_navigation move_base_mapless_demo.launch')
         # Unpause simulation to make observation
-        rospy.wait_for_service('/gazebo/unpause_physics')
-        try:
-            #resp_pause = pause.call()
-            self.unpause()
-        except (rospy.ServiceException) as e:
-            print ("/gazebo/unpause_physics service call failed")
-
         pub_goal=rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size=5)
         
-        self.goal.header.frame_id="map"
+        self.goal.header.frame_id="odom"
         self.goal.pose.position.x=7.0
         self.goal.pose.position.y=7.0
         self.goal.pose.position.z=0.0
@@ -293,10 +307,18 @@ class GazeboHuskyReactiveControlEnv(gazebo_env.GazeboEnv):
 
         pub_goal.publish(self.goal)
 
+        rospy.wait_for_service('/gazebo/unpause_physics')
+        try:
+            #resp_pause = pause.call()
+            self.unpause()
+        except (rospy.ServiceException) as e:
+            print ("/gazebo/unpause_physics service call failed")
 
-        # Read plan
+
+        # self.plan = rospy.wait_for_message('/move_base/NavfnROS/plan', Path, timeout=5)
+        
+        #    Read plan
         # self.plan= None
-        # ctr =0 
         # while self.plan is None:
         #     try:
         #     	# Navfn planner node responds with a plan from current position to goal
@@ -309,7 +331,7 @@ class GazeboHuskyReactiveControlEnv(gazebo_env.GazeboEnv):
         #         pass
 
 
-        #print(plan)
+        # print(plan)
         # Read laser data
         data = None
         while data is None:
