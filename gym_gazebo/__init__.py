@@ -23,6 +23,13 @@ register(
     # More arguments here
 )
 register(
+    id='GazeboReactiveHuskyLidar-v0',
+    entry_point='gym_gazebo.envs.husky:GazeboHuskyReactiveControlEnv',
+    # More arguments here
+)
+
+
+register(
     id='GazeboHuskyWallMovingObstaclesLidar-v0',
     entry_point='gym_gazebo.envs.husky:GazeboHuskyWallMovingObstaclesLidarEnv',
     # More arguments here
