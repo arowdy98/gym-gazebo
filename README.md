@@ -11,7 +11,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## Build and install gym-gazebo
   
-* Install the gym-gazebo following the [installation instructions](#installation) given in the repository.    
+* Install the gym-gazebo following the [installation instructions](https://github.com/hari-sikchi/gym-gazebo/#installation) given in the repository.    
 
 For installation on ROS Indigo:-   
 1. Getting the ros packages necessary for our experiments 
@@ -45,7 +45,7 @@ Now, for the husky environment we require packages provided by Clearpath Robotic
     
   c. Add the following line to your bashrc.(Set the path for compiled plugins)  
   ```
-  export GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:../gym-gazebo/gym_gazebo/envs/husky/husky_plugin/build 
+  export GAZEBO_PLUGIN_PATH=${GAZEBO_PLUGIN_PATH}:<INSTALLATION_ROOT>/gym_gazebo/envs/husky/husky_plugin/build 
   
   ```
  
